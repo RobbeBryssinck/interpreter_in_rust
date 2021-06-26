@@ -57,14 +57,12 @@ impl Lexer {
             _ => result
         };
 
-        println!("About to read...");
         self.read_char();
 
         result
     }
 
     fn read_char(&mut self) {
-        println!("Reading..");
         if self.read_position >= self.input.chars().count() {
             self.character = '\x00';
         } else {
@@ -77,11 +75,9 @@ impl Lexer {
     fn read_identifier(&mut self) -> &str {
         let position = self.position;
 
-        println!("Reading identifier...");
         while self.is_letter() {
             self.read_char();
         }
-        println!("Done reading identifier: {}", &self.input[position as usize..self.position as usize]);
 
         &self.input[position as usize..self.position as usize]
     }
@@ -323,6 +319,8 @@ let result = add(five, ten);
                     }
                 }
             };
+
+            println!("TYPE: {}, LITERAL: {}", fetched_token.token_type, fetched_token.literal);
             
             assert_eq!(fetched_token.token_type, test_token.token_type);
             assert_eq!(fetched_token.literal, test_token.literal);
