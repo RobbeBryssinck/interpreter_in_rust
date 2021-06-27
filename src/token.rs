@@ -1,6 +1,7 @@
 use phf::phf_map;
 
 // TODO: string for token type might not be performant
+#[derive(Debug)]
 pub struct Token {
     pub token_type: String,
     pub literal: String,

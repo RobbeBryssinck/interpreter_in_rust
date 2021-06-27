@@ -7,7 +7,7 @@ pub enum TokenParsingError {
     UnknownToken,
 }
 
-struct Lexer {
+pub struct Lexer {
     input: String,
     position: usize,
     read_position: usize,
