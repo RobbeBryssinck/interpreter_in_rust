@@ -34,11 +34,17 @@ impl Lexer {
 
         let result = match self.character {
             '=' => Ok(Token::new(String::from(token::ASSIGN), String::from(self.character), false)),
+            '+' => Ok(Token::new(String::from(token::PLUS), String::from(self.character), false)),
+            '-' => Ok(Token::new(String::from(token::MINUS), String::from(self.character), false)),
+            '!' => Ok(Token::new(String::from(token::BANG), String::from(self.character), false)),
+            '/' => Ok(Token::new(String::from(token::SLASH), String::from(self.character), false)),
+            '*' => Ok(Token::new(String::from(token::ASTERISK), String::from(self.character), false)),
+            '<' => Ok(Token::new(String::from(token::LT), String::from(self.character), false)),
+            '>' => Ok(Token::new(String::from(token::GT), String::from(self.character), false)),
             ';' => Ok(Token::new(String::from(token::SEMICOLON), String::from(self.character), false)),
             '(' => Ok(Token::new(String::from(token::LPAREN), String::from(self.character), false)),
             ')' => Ok(Token::new(String::from(token::RPAREN), String::from(self.character), false)),
             ',' => Ok(Token::new(String::from(token::COMMA), String::from(self.character), false)),
-            '+' => Ok(Token::new(String::from(token::PLUS), String::from(self.character), false)),
             '{' => Ok(Token::new(String::from(token::LBRACE), String::from(self.character), false)),
             '}' => Ok(Token::new(String::from(token::RBRACE), String::from(self.character), false)),
             '\x00' => Ok(Token::new(String::from(token::EOF), String::from(""), false)),
@@ -105,7 +111,7 @@ impl Lexer {
 
 #[cfg(test)]
 mod tests {
-    use crate::token::{FUNCTION, IDENT, INT, LET};
+    use crate::token::{ASTERISK, BANG, FUNCTION, GT, IDENT, INT, LET, LT, MINUS, SLASH};
 
     use super::token::{Token, ASSIGN, PLUS, LPAREN, RPAREN, LBRACE, RBRACE, COMMA, SEMICOLON, EOF};
     use super::*;
@@ -114,10 +120,14 @@ mod tests {
 	fn next_token_test() {
         let input = String::from("let five = 5;
 let ten = 10;
+
 let add = fn(x, y) {
-x + y;
+    x + y;
 };
+
 let result = add(five, ten);
+!-/*5;
+5 < 10 > 5;
 ");
 
         let test_tokens = [
@@ -302,6 +312,66 @@ let result = add(five, ten);
                 is_identifier: false,
             },
             Token {
+                token_type: String::from(BANG),
+                literal: String::from("!"),
+                is_identifier: false,
+            },
+            Token {
+                token_type: String::from(MINUS),
+                literal: String::from("-"),
+                is_identifier: false,
+            },
+            Token {
+                token_type: String::from(SLASH),
+                literal: String::from("/"),
+                is_identifier: false,
+            },
+            Token {
+                token_type: String::from(ASTERISK),
+                literal: String::from("*"),
+                is_identifier: false,
+            },
+            Token {
+                token_type: String::from(INT),
+                literal: String::from("5"),
+                is_identifier: false,
+            },
+            Token {
+                token_type: String::from(SEMICOLON),
+                literal: String::from(";"),
+                is_identifier: false,
+            },
+            Token {
+                token_type: String::from(INT),
+                literal: String::from("5"),
+                is_identifier: false,
+            },
+            Token {
+                token_type: String::from(LT),
+                literal: String::from("<"),
+                is_identifier: false,
+            },
+            Token {
+                token_type: String::from(INT),
+                literal: String::from("10"),
+                is_identifier: false,
+            },
+            Token {
+                token_type: String::from(GT),
+                literal: String::from(">"),
+                is_identifier: false,
+            },
+            Token {
+                token_type: String::from(INT),
+                literal: String::from("5"),
+                is_identifier: false,
+            },
+            Token {
+                token_type: String::from(SEMICOLON),
+                literal: String::from(";"),
+                is_identifier: false,
+            },
+            Token {
                 token_type: String::from(EOF),
                 literal: String::from(""),
                 is_identifier: false,
@@ -320,7 +390,7 @@ let result = add(five, ten);
                 }
             };
 
-            println!("TYPE: {}, LITERAL: {}", fetched_token.token_type, fetched_token.literal);
+            println!("TYPE: {}, LITERAL: {}, EXPECTED TYPE: {}, EXPECTED LITERAL: {}", fetched_token.token_type, fetched_token.literal, test_token.token_type, test_token.literal);
             
             assert_eq!(fetched_token.token_type, test_token.token_type);
             assert_eq!(fetched_token.literal, test_token.literal);
