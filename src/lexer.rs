@@ -33,9 +33,17 @@ impl Lexer {
         self.skip_whitespace();
 
         let result = match self.character {
+            '=' if self.peek_char() == '=' => {
+                self.read_char();
+                Ok(Token::new(String::from(token::EQ), String::from("==")))
+            },
             '=' => Ok(Token::new(String::from(token::ASSIGN), String::from(self.character))),
             '+' => Ok(Token::new(String::from(token::PLUS), String::from(self.character))),
             '-' => Ok(Token::new(String::from(token::MINUS), String::from(self.character))),
+            '!' if self.peek_char() == '=' => {
+                self.read_char();
+                Ok(Token::new(String::from(token::NOT_EQ), String::from("!=")))
+            },
             '!' => Ok(Token::new(String::from(token::BANG), String::from(self.character))),
             '/' => Ok(Token::new(String::from(token::SLASH), String::from(self.character))),
             '*' => Ok(Token::new(String::from(token::ASTERISK), String::from(self.character))),
@@ -105,6 +113,14 @@ impl Lexer {
         &self.input[lower_position..upper_position]
     }
 
+    fn peek_char(&self) -> char {
+        if self.read_position >= self.input.chars().count() {
+            return '\x00';
+        } else {
+            return self.input.chars().nth(self.read_position).expect("Cannot read character.");
+        }
+    }
+
     fn is_letter(&self) -> bool {
         self.character.is_alphabetic() || self.character == '_'
     }
@@ -118,7 +134,7 @@ impl Lexer {
 
 #[cfg(test)]
 mod tests {
-    use crate::token::{ASTERISK, BANG, FUNCTION, GT, IDENT, INT, LET, LT, MINUS, SLASH};
+    use crate::token::{ASTERISK, BANG, ELSE, EQ, FALSE, FUNCTION, GT, IDENT, IF, INT, LET, LT, MINUS, NOT_EQ, RETURN, SLASH, TRUE};
 
     use super::token::{Token, ASSIGN, PLUS, LPAREN, RPAREN, LBRACE, RBRACE, COMMA, SEMICOLON, EOF};
     use super::*;
@@ -135,6 +151,15 @@ let add = fn(x, y) {
 let result = add(five, ten);
 !-/*5;
 5 < 10 > 5;
+
+if (5 < 10) {
+    return true;
+} else {
+    return false;
+}
+
+10 == 10;
+10 != 9;
 ");
 
         let test_tokens = [
@@ -325,6 +350,106 @@ let result = add(five, ten);
             Token {
                 token_type: String::from(INT),
                 literal: String::from("5"),
+            },
+            Token {
+                token_type: String::from(SEMICOLON),
+                literal: String::from(";"),
+            },
+            Token {
+                token_type: String::from(IF),
+                literal: String::from("if"),
+            },
+            Token {
+                token_type: String::from(LPAREN),
+                literal: String::from("("),
+            },
+            Token {
+                token_type: String::from(INT),
+                literal: String::from("5"),
+            },
+            Token {
+                token_type: String::from(LT),
+                literal: String::from("<"),
+            },
+            Token {
+                token_type: String::from(INT),
+                literal: String::from("10"),
+            },
+            Token {
+                token_type: String::from(RPAREN),
+                literal: String::from(")"),
+            },
+            Token {
+                token_type: String::from(LBRACE),
+                literal: String::from("{"),
+            },
+            Token {
+                token_type: String::from(RETURN),
+                literal: String::from("return"),
+            },
+            Token {
+                token_type: String::from(TRUE),
+                literal: String::from("true"),
+            },
+            Token {
+                token_type: String::from(SEMICOLON),
+                literal: String::from(";"),
+            },
+            Token {
+                token_type: String::from(RBRACE),
+                literal: String::from("}"),
+            },
+            Token {
+                token_type: String::from(ELSE),
+                literal: String::from("else"),
+            },
+            Token {
+                token_type: String::from(LBRACE),
+                literal: String::from("{"),
+            },
+            Token {
+                token_type: String::from(RETURN),
+                literal: String::from("return"),
+            },
+            Token {
+                token_type: String::from(FALSE),
+                literal: String::from("false"),
+            },
+            Token {
+                token_type: String::from(SEMICOLON),
+                literal: String::from(";"),
+            },
+            Token {
+                token_type: String::from(RBRACE),
+                literal: String::from("}"),
+            },
+            Token {
+                token_type: String::from(INT),
+                literal: String::from("10"),
+            },
+            Token {
+                token_type: String::from(EQ),
+                literal: String::from("=="),
+            },
+            Token {
+                token_type: String::from(INT),
+                literal: String::from("10"),
+            },
+            Token {
+                token_type: String::from(SEMICOLON),
+                literal: String::from(";"),
+            },
+            Token {
+                token_type: String::from(INT),
+                literal: String::from("10"),
+            },
+            Token {
+                token_type: String::from(NOT_EQ),
+                literal: String::from("!="),
+            },
+            Token {
+                token_type: String::from(INT),
+                literal: String::from("9"),
             },
             Token {
                 token_type: String::from(SEMICOLON),
